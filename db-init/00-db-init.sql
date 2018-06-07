@@ -38,12 +38,12 @@ CREATE TABLE `photos` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `businesses`
+-- Dumping data for table `albums`
 --
 
-LOCK TABLES `businesses` WRITE;
-/*!40000 ALTER TABLE `businesses` DISABLE KEYS */;
-INSERT INTO `businesses` VALUES (1,'Block 15','300 SW Jefferson Ave.','Corvallis','OR','97333','541-758-2077','Restaurant','Brewpub','http://block15.com',NULL,'test_user1'),
+LOCK TABLES `albums` WRITE;
+/*!40000 ALTER TABLE `albums` DISABLE KEYS */;
+INSERT INTO `albums` VALUES (1,'Block 15','300 SW Jefferson Ave.','Corvallis','OR','97333','541-758-2077','Restaurant','Brewpub','http://block15.com',NULL,'test_user1'),
 				(2,'Robnett\'s Hardware','400 SW 2nd St.','Corvallis','OR','97333','541-753-5531','Shopping','Hardware',NULL,NULL,'test_user2'),
 				(3,'Corvallis Brewing Supply','119 SW 4th St.','Corvallis','OR','97333','541-758-1674','Shopping','Brewing Supply','http://www.lickspigot.com',NULL,'test_user3'),
 				(4,'First Alternative Co-op North Store','2855 NW Grant Ave.','Corvallis','OR','97330','541-452-3115','Shopping','Groceries',NULL,NULL,'test_user1'),
@@ -62,7 +62,7 @@ INSERT INTO `businesses` VALUES (1,'Block 15','300 SW Jefferson Ave.','Corvallis
 				(17,'First Alternative Co-op South Store','1007 SE 3rd St.','Corvallis','OR','97333','541-753-3115','Shopping','Groceries',NULL,NULL,'test_user2'),
 				(18,'Block 15 Brewery & Tap Room','3415 SW Deschutes St.','Corvallis','OR','97333','541-752-2337','Restaurant','Brewpub','http://block15.com',NULL,'test_user3'),
 				(19,'The Beanery Monroe','2541 NW Monroe Ave.','Corvallis','OR','97330','541-757-0828','Restaurant','Coffee Shop',NULL,NULL,'test_user1');
-/*!40000 ALTER TABLE `businesses` ENABLE KEYS */;
+/*!40000 ALTER TABLE `albums` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -117,11 +117,11 @@ CREATE TABLE `reviews` (
   `stars` float NOT NULL,
   `review` text,
   `userid` char(24) NOT NULL,
-  `businessid` mediumint(9) NOT NULL,
+  `albumid` mediumint(9) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_userid` (`userid`),
-  KEY `idx_businessid` (`businessid`),
-  CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`businessid`) REFERENCES `businesses` (`id`) ON DELETE CASCADE
+  KEY `idx_albumid` (`albumid`),
+  CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`albumid`) REFERENCES `albums` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
