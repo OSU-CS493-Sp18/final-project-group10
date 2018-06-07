@@ -6,7 +6,7 @@ const validation = require('../lib/validation');
  */
 const photoSchema = {
   userid: { required: true },
-  businessid: { required: true },
+  albumid: { required: true },
   caption: { required: false },
   data: { required: true }
 };
@@ -45,7 +45,7 @@ router.post('/', function (req, res, next) {
           id: id,
           links: {
             photo: `/photos/${id}`,
-            business: `/businesses/${req.body.businessid}`
+            album: `/albums/${req.body.albumid}`
           }
         });
       })
@@ -127,14 +127,14 @@ router.put('/:photoID', function (req, res, next) {
   if (validation.validateAgainstSchema(req.body, photoSchema)) {
     let updatedPhoto = validation.extractValidFields(req.body, photoSchema);
     /*
-     * Make sure the updated photo has the same businessID and userID as
+     * Make sure the updated photo has the same albumID and userID as
      * the existing photo.  If it doesn't, respond with a 403 error.  If the
      * photo doesn't already exist, respond with a 404 error.
      */
     getPhotoByID(photoID, mysqlPool)
       .then((existingPhoto) => {
         if (existingPhoto) {
-          if (updatedPhoto.businessid === existingPhoto.businessid && updatedPhoto.userid === existingPhoto.userid) {
+          if (updatedPhoto.albumid === existingPhoto.albumid && updatedPhoto.userid === existingPhoto.userid) {
             return replacePhotoByID(photoID, updatedPhoto, mysqlPool);
           } else {
             return Promise.reject(403);
@@ -147,7 +147,7 @@ router.put('/:photoID', function (req, res, next) {
         if (updateSuccessful) {
           res.status(200).json({
             links: {
-              business: `/businesses/${updatedPhoto.businessid}`,
+              album: `/albums/${updatedPhoto.albumid}`,
               photo: `/photos/${photoID}`
             }
           });
@@ -158,7 +158,7 @@ router.put('/:photoID', function (req, res, next) {
       .catch((err) => {
         if (err === 403) {
           res.status(403).json({
-            error: "Updated photo must have the same businessID and userID"
+            error: "Updated photo must have the same albumID and userID"
           });
         } else {
           res.status(500).json({
@@ -213,17 +213,17 @@ router.delete('/:photoID', function (req, res, next) {
 });
 
 /*
- * Executes a MySQL query to fetch all photos for a specified business, based
- * on the business's ID.  Returns a Promise that resolves to an array
+ * Executes a MySQL query to fetch all photos for a specified album, based
+ * on the album's ID.  Returns a Promise that resolves to an array
  * containing the requested photos.  This array could be empty if the
- * specified business does not have any photos.  This function does not verify
- * that the specified business ID corresponds to a valid business.
+ * specified album does not have any photos.  This function does not verify
+ * that the specified album ID corresponds to a valid album.
  */
-function getPhotosByBusinessID(businessID, mysqlPool) {
+function getPhotosByBusinessID(albumID, mysqlPool) {
   return new Promise((resolve, reject) => {
     mysqlPool.query(
-      'SELECT * FROM photos WHERE businessid = ?',
-      [ businessID ],
+      'SELECT * FROM photos WHERE albumid = ?',
+      [ albumID ],
       function (err, results) {
         if (err) {
           reject(err);
