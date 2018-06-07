@@ -77,11 +77,11 @@ CREATE TABLE `photos` (
   `caption` text,
   `data` longblob NOT NULL,
   `userid` char(24) NOT NULL,
-  `businessid` mediumint(9) NOT NULL,
+  `albumid` mediumint(9) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_userid` (`userid`),
-  KEY `idx_businessid` (`businessid`),
-  CONSTRAINT `photos_ibfk_1` FOREIGN KEY (`businessid`) REFERENCES `businesses` (`id`) ON DELETE CASCADE
+  KEY `idx_albumid` (`albumid`),
+  CONSTRAINT `photos_ibfk_1` FOREIGN KEY (`albumid`) REFERENCES `albums` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
