@@ -5,7 +5,6 @@ const ObjectId = require('mongodb').ObjectId;
 const { generateAuthToken, requireAuthentication } = require('../lib/auth');
 
 const { getAlbumsByOwnerID } = require('./albums');
-const { getReviewsByUserID } = require('./reviews');
 const { getPhotosByUserID } = require('./photos');
 
 function validateUserObject(user) {
@@ -20,8 +19,7 @@ function insertNewUser(user, mongoDB) {
         email: user.email,
         password: passwordHash,
         albums: [],
-	      photos: [],
-	      reviews: []
+	      photos: []
       };
       const usersCollection = mongoDB.collection('users');
       return usersCollection.insertOne(userDocument);
