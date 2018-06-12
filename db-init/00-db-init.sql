@@ -1,156 +1,45 @@
--- MySQL dump 10.13  Distrib 5.7.22, for Linux (x86_64)
---
--- Host: localhost    Database: photog
--- ------------------------------------------------------
--- Server version	5.7.22
+-- Adminer 4.6.2 MySQL dump
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+SET NAMES utf8;
+SET time_zone = '+00:00';
+SET foreign_key_checks = 0;
+SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
---
--- Table structure for table `photos`
---
-
-DROP TABLE IF EXISTS `photos`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `photos` (
+DROP TABLE IF EXISTS `albums`;
+CREATE TABLE `albums` (
   `id` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) NOT NULL,
-  `address` varchar(255) NOT NULL,
-  `city` varchar(255) NOT NULL,
-  `state` char(2) NOT NULL,
-  `zip` char(5) NOT NULL,
-  `phone` char(12) NOT NULL,
-  
+  `name` varchar(255) NOT NULL,
+  `category` varchar(255) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
   `ownerid` char(24) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_ownerid` (`ownerid`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `albums`
---
-
-LOCK TABLES `albums` WRITE;
-/*!40000 ALTER TABLE `albums` DISABLE KEYS */;
-INSERT INTO `albums` VALUES (1,'Block 15','300 SW Jefferson Ave.','Corvallis','OR','97333','541-758-2077','Restaurant','Brewpub','http://block15.com',NULL,'test_user1'),
-				(2,'Robnett\'s Hardware','400 SW 2nd St.','Corvallis','OR','97333','541-753-5531','Shopping','Hardware',NULL,NULL,'test_user2'),
-				(3,'Corvallis Brewing Supply','119 SW 4th St.','Corvallis','OR','97333','541-758-1674','Shopping','Brewing Supply','http://www.lickspigot.com',NULL,'test_user3'),
-				(4,'First Alternative Co-op North Store','2855 NW Grant Ave.','Corvallis','OR','97330','541-452-3115','Shopping','Groceries',NULL,NULL,'test_user1'),
-				(5,'Local Boyz','1425 NW Monroe Ave.','Corvallis','OR','97330','541-754-5338','Restaurant','Hawaiian',NULL,NULL,'test_user2'),
-				(6,'Interzone','1563 NW Monroe Ave.','Corvallis','OR','97330','541-754-5965','Restaurant','Coffee Shop',NULL,NULL,'test_user3'),
-				(7,'Darkside Cinema','215 SW 4th St.','Corvallis','OR','97333','541-752-4161','Entertainment','Movie Theater','http://darksidecinema.com',NULL,'test_user1'),
-				(8,'The Beanery Downtown','500 SW 2nd St.','Corvallis','OR','97333','541-753-7442','Restaurant','Coffee Shop',NULL,NULL,'test_user2'),
-				(9,'WinCo Foods','2335 NW Kings Blvd.','Corvallis','OR','97330','541-753-7002','Shopping','Groceries',NULL,NULL,'test_user3'),
-				(10,'The Book Bin','215 SW 4th St.','Corvallis','OR','97333','541-752-0040','Shopping','Book Store',NULL,NULL,'test_user1'),
-				(11,'Fred Meyer','777 NW Kings Blvd.','Corvallis','OR','97330','541-753-9116','Shopping','Groceries',NULL,NULL,'test_user2'),
-				(12,'Cyclotopia','435 SW 2nd St.','Corvallis','OR','97333','541-757-9694','Shopping','Bicycle Shop',NULL,NULL,'test_user3'),
-				(13,'Oregon Coffee & Tea','215 NW Monroe Ave.','Corvallis','OR','97333','541-752-2421','Shopping','Tea House','http://www.oregoncoffeeandtea.com',NULL,'test_user1'),
-				(14,'Corvallis Cyclery','344 SW 2nd St.','Corvallis','OR','97333','541-752-5952','Shopping','Bicycle Shop',NULL,NULL,'test_user2'),
-				(15,'Spaeth Lumber','1585 NW 9th St.','Corvallis','OR','97330','541-752-1930','Shopping','Hardware',NULL,NULL,'test_user3'),
-				(16,'New Morning Bakery','219 SW 2nd St.','Corvallis','OR','97333','541-754-0181','Restaurant','Bakery',NULL,NULL,'test_user1'),
-				(17,'First Alternative Co-op South Store','1007 SE 3rd St.','Corvallis','OR','97333','541-753-3115','Shopping','Groceries',NULL,NULL,'test_user2'),
-				(18,'Block 15 Brewery & Tap Room','3415 SW Deschutes St.','Corvallis','OR','97333','541-752-2337','Restaurant','Brewpub','http://block15.com',NULL,'test_user3'),
-				(19,'The Beanery Monroe','2541 NW Monroe Ave.','Corvallis','OR','97330','541-757-0828','Restaurant','Coffee Shop',NULL,NULL,'test_user1');
-/*!40000 ALTER TABLE `albums` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `photos`
---
+INSERT INTO `albums` (`id`, `name`, `category`, `email`, `ownerid`) VALUES
+(1,	'Dogs',	'Animals',	'lioyj@oregonstate.edu',	'1'),
+(2,	'Cats',	'Animals',	'lioyj@oregonstate.edu',	'1'),
+(3,	'Mole Rats',	'Animals',	'moleratlover@yahoo.com',	'2');
 
 DROP TABLE IF EXISTS `photos`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `photos` (
-  `id` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `caption` text,
-  `data` longblob NOT NULL,
-  `userid` char(24) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `userid` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `caption` text NOT NULL,
+  `data` text NOT NULL,
   `albumid` mediumint(9) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `idx_userid` (`userid`),
-  KEY `idx_albumid` (`albumid`),
-  CONSTRAINT `photos_ibfk_1` FOREIGN KEY (`albumid`) REFERENCES `albums` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+  KEY `albumid` (`albumid`),
+  CONSTRAINT `photos_ibfk_1` FOREIGN KEY (`albumid`) REFERENCES `albums` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `photos`
---
+INSERT INTO `photos` (`id`, `userid`, `title`, `caption`, `data`, `albumid`) VALUES
+(3,	1,	'Dog 1',	'Dog 1',	'00111101 00110101 11100001 11110011 00101100 11111001 00101100 01011010 \r\n11110011 11010100 ',	1),
+(4,	1,	'Dog 2',	'Dog 2',	'00111000 01000100 10011001 00111000 00101001 11110001 10101001 11111100 \r\n11001011 10010011 ',	1),
+(5,	1,	'Cat 1',	'Cat 1',	'10100000 01000010 00100101 10000010 01001111 01100100 10011110 10111011 \r\n01110010 01010010 ',	2),
+(6,	1,	'Cat 2',	'Cat 2',	'01000010 10111110 00010010 11000001 00011001 10101000 00100000 01001011 \r\n01100101 01110001 ',	2),
+(7,	2,	'Mole Rat 1',	'Mole Rat 1',	'11011100 10010010 01001011 00010010 00000010 11011100 00100001 10100010 \r\n01111001 11011000 ',	3),
+(8,	2,	'Mole Rat 2',	'Mole Rat 2',	'10110000 10001010 10111000 00011100 10000011 00011111 00001111 01101100 \r\n10110101 01011000 ',	3);
 
-LOCK TABLES `photos` WRITE;
-/*!40000 ALTER TABLE `photos` DISABLE KEYS */;
-INSERT INTO `photos` VALUES (1,NULL,'010010101110101010110','test_user1',15),
-			    (2,NULL,'010010101110101010110','test_user2',2),
-			    (3,'Hops','010010101110101010110','test_user3',3),
-			    (4,'Sticky Hands','010010101110101010110','test_user1',18),
-			    (5,NULL,'010010101110101010110','test_user2',2),
-			    (6,'Popcorn!','010010101110101010110','test_user3',7),
-			    (7,'This is my dinner.','010010101110101010110','test_user1',5),
-			    (8,'Big fermentor','010010101110101010110','test_user2',18),
-			    (9,'Cake!','010010101110101010110','test_user3',16),
-			    (10,NULL,'010010101110101010110','test_user1',5);
-/*!40000 ALTER TABLE `photos` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `reviews`
---
-
-DROP TABLE IF EXISTS `reviews`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `reviews` (
-  `id` mediumint(9) NOT NULL AUTO_INCREMENT,
-  `dollars` tinyint(4) NOT NULL,
-  `stars` float NOT NULL,
-  `review` text,
-  `userid` char(24) NOT NULL,
-  `albumid` mediumint(9) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `idx_userid` (`userid`),
-  KEY `idx_albumid` (`albumid`),
-  CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`albumid`) REFERENCES `albums` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `reviews`
---
-
-LOCK TABLES `reviews` WRITE;
-/*!40000 ALTER TABLE `reviews` DISABLE KEYS */;
-INSERT INTO `reviews` VALUES (1,1,4.5,'Cheap, delicious food.','test_user1',5),
-			     (2,2,4,NULL,'test_user2',15),
-			     (3,2,5,'Try the hazlenut torte.  It\'s the best!','test_user3',16),
-			     (4,1,5,'Joel, the owner, is super friendly and helpful.','test_user1',3),
-			     (5,1,5,'A Corvallis gem.','test_user2',7),
-			     (6,1,5,'Yummmmmmm!','test_user3',5),
-			     (7,2,4,NULL,'test_user1',2),
-			     (8,1,4,'How many fasteners can one room hold?','test_user2',2),
-			     (9,1,4,'Good beer, good food, though limited selection.','test_user3',18),
-			     (10,2,4.5,NULL,'test_user1',18);
-/*!40000 ALTER TABLE `reviews` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2018-05-16  6:47:05
+-- 2018-06-12 17:23:44

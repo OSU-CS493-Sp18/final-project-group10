@@ -6,9 +6,10 @@ const validation = require('../lib/validation');
  */
 const photoSchema = {
   userid: { required: true },
-  albumid: { required: true },
+  title: {required: true},
   caption: { required: false },
-  data: { required: true }
+  data: { required: true },
+  albumid: { required: true }
 };
 
 /*
