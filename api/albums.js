@@ -1,27 +1,113 @@
 const router = require('express').Router();
 const validation = require('../lib/validation');
+const { getPhotosByAlbumID } = require('./photos');
 
 /*
- * Schema describing required/optional fields of a photo object.
+ * Schema describing required/optional fields of a album object.
  */
-const photoSchema = {
-  userid: { required: true },
-  albumid: { required: true },
-  caption: { required: false },
-  data: { required: true }
+const albumSchema = {
+  name: { required: true },
+  category: { required: true },
+  email: { required: false },
+  ownerid: { required: true }
 };
 
 /*
- * Executes a MySQL query to insert a new photo into the database.  Returns
- * a Promise that resolves to the ID of the newly-created photo entry.
+ * Executes a MySQL query to fetch the total number of Albums.  Returns
+ * a Promise that resolves to this count.
  */
-function insertNewPhoto(photo, mysqlPool) {
+function getAlbumsCount(mysqlPool) {
   return new Promise((resolve, reject) => {
-    photo = validation.extractValidFields(photo, photoSchema);
-    photo.id = null;
+    mysqlPool.query('SELECT COUNT(*) AS count FROM albums', function (err, results) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(results[0].count);
+      }
+    });
+  });
+}
+
+/*
+ * Executes a MySQL query to return a single page of Albums.  Returns a
+ * Promise that resolves to an array containing the fetched page of Albums.
+ */
+function getAlbumsPage(page, totalCount, mysqlPool) {
+  return new Promise((resolve, reject) => {
+    /*
+     * Compute last page number and make sure page is within allowed bounds.
+     * Compute offset into collection.
+     */
+    const numPerPage = 10;
+    const lastPage = Math.max(Math.ceil(totalCount / numPerPage), 1);
+    page = page < 1 ? 1 : page;
+    page = page > lastPage ? lastPage : page;
+    const offset = (page - 1) * numPerPage;
+
     mysqlPool.query(
-      'INSERT INTO photos SET ?',
-      photo,
+      'SELECT * FROM albums ORDER BY id LIMIT ?,?',
+      [ offset, numPerPage ],
+      function (err, results) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({
+            albums: results,
+            pageNumber: page,
+            totalPages: lastPage,
+            pageSize: numPerPage,
+            totalCount: totalCount
+          });
+        }
+      }
+    );
+  });
+}
+
+/*
+ * Route to return a paginated list of Albums.
+ */
+router.get('/', function (req, res) {
+  const mysqlPool = req.app.locals.mysqlPool;
+  getAlbumsCount(mysqlPool)
+    .then((count) => {
+      return getAlbumsPage(parseInt(req.query.page) || 1, count, mysqlPool);
+    })
+    .then((AlbumsPageInfo) => {
+      /*
+       * Generate HATEOAS links for surrounding pages and then send response.
+       */
+      AlbumsPageInfo.links = {};
+      let { links, pageNumber, totalPages } = AlbumsPageInfo;
+      if (pageNumber < totalPages) {
+        links.nextPage = `/Albums?page=${pageNumber + 1}`;
+        links.lastPage = `/Albums?page=${totalPages}`;
+      }
+      if (pageNumber > 1) {
+        links.prevPage = `/Albums?page=${pageNumber - 1}`;
+        links.firstPage = '/Albums?page=1';
+      }
+      res.status(200).json(AlbumsPageInfo);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({
+        error: "Error fetching Albums list.  Please try again later."
+      });
+    });
+});
+
+/*
+ * Executes a MySQL query to insert a new album into the database.  Returns
+ * a Promise that resolves to the ID of the newly-created album entry.
+ */
+function insertNewAlbum(album, mysqlPool) {
+  return new Promise((resolve, reject) => {
+    album = validation.extractValidFields(album, albumSchema);
+    album.id = null;
+    mysqlPool.query(
+      'INSERT INTO albums SET ?',
+      album,
       function (err, result) {
         if (err) {
           reject(err);
@@ -34,81 +120,101 @@ function insertNewPhoto(photo, mysqlPool) {
 }
 
 /*
- * Route to create a new photo.
+ * Route to create a new album.
  */
 router.post('/', function (req, res, next) {
   const mysqlPool = req.app.locals.mysqlPool;
-  if (validation.validateAgainstSchema(req.body, photoSchema)) {
-    insertNewPhoto(req.body, mysqlPool)
+  if (validation.validateAgainstSchema(req.body, albumSchema)) {
+    insertNewAlbum(req.body, mysqlPool)
       .then((id) => {
         res.status(201).json({
           id: id,
           links: {
-            photo: `/photos/${id}`,
-            album: `/albums/${req.body.albumid}`
+            album: `/album/${id}`
           }
         });
       })
       .catch((err) => {
         res.status(500).json({
-          error: "Error inserting photo into DB.  Please try again later."
+          error: "Error inserting album into DB.  Please try again later."
         });
       });
   } else {
     res.status(400).json({
-      error: "Request body is not a valid photo object"
+      error: "Request body is not a valid album object."
     });
   }
 });
 
 /*
- * Executes a MySQL query to fetch a single specified photo based on its ID.
- * Returns a Promise that resolves to an object containing the requested
- * photo.  If no photo with the specified ID exists, the returned Promise
- * will resolve to null.
+ * Executes a MySQL query to fetch information about a single specified
+ * album based on its ID.  Returns a Promise that resolves to an object
+ * containing information about the requested album.  If no album with
+ * the specified ID exists, the returned Promise will resolve to null.
  */
-function getPhotoByID(photoID, mysqlPool) {
+function getAlbumByID(albumID, mysqlPool) {
+  /*
+   * Execute three sequential queries to get all of the info about the
+   * specified album, including its reviews and photos.  If the original
+   * request to fetch the album doesn't match a album, send null through
+   * the promise chain.
+   */
+  let returnAlbum = {};
   return new Promise((resolve, reject) => {
-    mysqlPool.query('SELECT * FROM photos WHERE id = ?', [ photoID ], function (err, results) {
+    mysqlPool.query('SELECT * FROM albums WHERE id = ?', [ albumID ], function (err, results) {
       if (err) {
         reject(err);
       } else {
         resolve(results[0]);
       }
     });
-  });
+  }).then((album) => {
+    if (album) {
+      returnAlbum = album;
+      return getPhotosByAlbumID(albumID, mysqlPool);
+    } else {
+      return Promise.resolve(null);
+    }
+  }).then((photos) => {
+    if (photos) {
+      returnAlbum.photos = photos;
+      return Promise.resolve(returnAlbum);
+    } else {
+      return Promise.resolve(null);
+    }
+  })
 }
 
 /*
- * Route to fetch info about a specific photo.
+ * Route to fetch info about a specific album.
  */
-router.get('/:photoID', function (req, res, next) {
+router.get('/:albumID', function (req, res, next) {
   const mysqlPool = req.app.locals.mysqlPool;
-  const photoID = parseInt(req.params.photoID);
-  getPhotoByID(photoID, mysqlPool)
-    .then((photo) => {
-      if (photo) {
-        res.status(200).json(photo);
+  const albumID = parseInt(req.params.albumID);
+  getAlbumByID(albumID, mysqlPool)
+    .then((album) => {
+      if (album) {
+        res.status(200).json(album);
       } else {
         next();
       }
     })
     .catch((err) => {
       res.status(500).json({
-        error: "Unable to fetch photo.  Please try again later."
+        error: "Unable to fetch album. Please try again later."
       });
     });
 });
 
 /*
- * Executes a MySQL query to replace a specified photo with new data.
- * Returns a Promise that resolves to true if the photo specified by
- * `photoID` existed and was successfully updated or to false otherwise.
+ * Executes a MySQL query to replace a specified album with new data.
+ * Returns a Promise that resolves to true if the album specified by
+ * `albumID` existed and was successfully updated or to false otherwise.
  */
-function replacePhotoByID(photoID, photo, mysqlPool) {
+function replaceAlbumByID(albumID, album, mysqlPool) {
   return new Promise((resolve, reject) => {
-    photo = validation.extractValidFields(photo, photoSchema);
-    mysqlPool.query('UPDATE photos SET ? WHERE id = ?', [ photo, photoID ], function (err, result) {
+    album = validation.extractValidFields(album, albumSchema);
+    mysqlPool.query('UPDATE albums SET ? WHERE id = ?', [ album, albumID ], function (err, result) {
       if (err) {
         reject(err);
       } else {
@@ -119,36 +225,18 @@ function replacePhotoByID(photoID, photo, mysqlPool) {
 }
 
 /*
- * Route to update a photo.
+ * Route to replace data for a album.
  */
-router.put('/:photoID', function (req, res, next) {
+router.put('/:albumID', function (req, res, next) {
   const mysqlPool = req.app.locals.mysqlPool;
-  const photoID = parseInt(req.params.photoID);
-  if (validation.validateAgainstSchema(req.body, photoSchema)) {
-    let updatedPhoto = validation.extractValidFields(req.body, photoSchema);
-    /*
-     * Make sure the updated photo has the same albumID and userID as
-     * the existing photo.  If it doesn't, respond with a 403 error.  If the
-     * photo doesn't already exist, respond with a 404 error.
-     */
-    getPhotoByID(photoID, mysqlPool)
-      .then((existingPhoto) => {
-        if (existingPhoto) {
-          if (updatedPhoto.albumid === existingPhoto.albumid && updatedPhoto.userid === existingPhoto.userid) {
-            return replacePhotoByID(photoID, updatedPhoto, mysqlPool);
-          } else {
-            return Promise.reject(403);
-          }
-        } else {
-          next();
-        }
-      })
+  const albumID = parseInt(req.params.albumID);
+  if (validation.validateAgainstSchema(req.body, albumSchema)) {
+    replaceAlbumByID(albumID, req.body, mysqlPool)
       .then((updateSuccessful) => {
         if (updateSuccessful) {
           res.status(200).json({
             links: {
-              album: `/albums/${updatedPhoto.albumid}`,
-              photo: `/photos/${photoID}`
+              album: `/albums/${albumID}`
             }
           });
         } else {
@@ -156,31 +244,26 @@ router.put('/:photoID', function (req, res, next) {
         }
       })
       .catch((err) => {
-        if (err === 403) {
-          res.status(403).json({
-            error: "Updated photo must have the same albumID and userID"
-          });
-        } else {
-          res.status(500).json({
-            error: "Unable to update photo.  Please try again later."
-          });
-        }
+        console.log(err);
+        res.status(500).json({
+          error: "Unable to update specified album.  Please try again later."
+        });
       });
   } else {
     res.status(400).json({
-      error: "Request body is not a valid photo object."
+      error: "Request body is not a valid album object"
     });
   }
 });
 
 /*
- * Executes a MySQL query to delete a photo specified by its ID.  Returns
- * a Promise that resolves to true if the photo specified by `photoID`
+ * Executes a MySQL query to delete a album specified by its ID.  Returns
+ * a Promise that resolves to true if the album specified by `albumID`
  * existed and was successfully deleted or to false otherwise.
  */
-function deletePhotoByID(photoID, mysqlPool) {
+function deleteAlbumByID(albumID, mysqlPool) {
   return new Promise((resolve, reject) => {
-    mysqlPool.query('DELETE FROM photos WHERE id = ?', [ photoID ], function (err, result) {
+    mysqlPool.query('DELETE FROM albums WHERE id = ?', [ albumID ], function (err, result) {
       if (err) {
         reject(err);
       } else {
@@ -192,12 +275,12 @@ function deletePhotoByID(photoID, mysqlPool) {
 }
 
 /*
- * Route to delete a photo.
+ * Route to delete a album.
  */
-router.delete('/:photoID', function (req, res, next) {
+router.delete('/:albumID', function (req, res, next) {
   const mysqlPool = req.app.locals.mysqlPool;
-  const photoID = parseInt(req.params.photoID);
-  deletePhotoByID(photoID, mysqlPool)
+  const albumID = parseInt(req.params.albumID);
+  deleteAlbumByID(albumID, mysqlPool)
     .then((deleteSuccessful) => {
       if (deleteSuccessful) {
         res.status(204).end();
@@ -207,45 +290,22 @@ router.delete('/:photoID', function (req, res, next) {
     })
     .catch((err) => {
       res.status(500).json({
-        error: "Unable to delete photo.  Please try again later."
+        error: "Unable to delete album.  Please try again later."
       });
     });
 });
 
 /*
- * Executes a MySQL query to fetch all photos for a specified album, based
- * on the album's ID.  Returns a Promise that resolves to an array
- * containing the requested photos.  This array could be empty if the
- * specified album does not have any photos.  This function does not verify
- * that the specified album ID corresponds to a valid album.
+ * Executes a MySQL query to fetch all Albums owned by a specified user,
+ * based on on the user's ID.  Returns a Promise that resolves to an array
+ * containing the requested Albums.  This array could be empty if the
+ * specified user does not own any Albums.  This function does not verify
+ * that the specified user ID corresponds to a valid user.
  */
-function getPhotosByBusinessID(albumID, mysqlPool) {
+function getAlbumsByOwnerID(userID, mysqlPool) {
   return new Promise((resolve, reject) => {
     mysqlPool.query(
-      'SELECT * FROM photos WHERE albumid = ?',
-      [ albumID ],
-      function (err, results) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(results);
-        }
-      }
-    );
-  });
-}
-
-/*
- * Executes a MySQL query to fetch all photos by a specified user, based on
- * on the user's ID.  Returns a Promise that resolves to an array containing
- * the requested photos.  This array could be empty if the specified user
- * does not have any photos.  This function does not verify that the specified
- * user ID corresponds to a valid user.
- */
-function getPhotosByUserID(userID, mysqlPool) {
-  return new Promise((resolve, reject) => {
-    mysqlPool.query(
-      'SELECT * FROM photos WHERE userid = ?',
+      'SELECT * FROM albums WHERE ownerid = ?',
       [ userID ],
       function (err, results) {
         if (err) {
@@ -259,5 +319,4 @@ function getPhotosByUserID(userID, mysqlPool) {
 }
 
 exports.router = router;
-exports.getPhotosByBusinessID = getPhotosByBusinessID;
-exports.getPhotosByUserID = getPhotosByUserID;
+exports.getAlbumsByOwnerID = getAlbumsByOwnerID;

@@ -220,7 +220,7 @@ router.delete('/:photoID', function (req, res, next) {
  * specified album does not have any photos.  This function does not verify
  * that the specified album ID corresponds to a valid album.
  */
-function getPhotosByAlbumid(albumid, mysqlPool) {
+function getPhotosByAlbumID(albumid, mysqlPool) {
   return new Promise((resolve, reject) => {
     mysqlPool.query(
       'SELECT * FROM photos WHERE albumid = ?',
@@ -260,5 +260,5 @@ function getPhotosByUserID(userID, mysqlPool) {
 }
 
 exports.router = router;
-exports.getPhotosByAlbumid = getPhotosByAlbumid;
+exports.getPhotosByAlbumID = getPhotosByAlbumID;
 exports.getPhotosByUserID = getPhotosByUserID;
