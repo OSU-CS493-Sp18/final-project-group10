@@ -1,0 +1,529 @@
+openapi: 3.0.0
+info:
+  title: Final Assignment
+  description: 'TODO: Add Description'
+  version: '1.0'
+servers:
+- url: http://localhost:8000
+  variables: {}
+paths:
+  /albums:
+    get:
+      tags:
+      - Album Endpoints
+      summary: GET Albums
+      description: Returns the list of all businesses.
+      operationId: GetAlbums
+      parameters: []
+      responses:
+        200:
+          description: ''
+      deprecated: false
+      security: []
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+    post:
+      tags:
+      - Album Endpoints
+      summary: POST Album
+      description: POST endpoint for the business noun.
+      operationId: PostAlbum
+      parameters:
+      - name: Content-Type
+        in: header
+        description: ''
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: application/json
+        example: application/json
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              example:
+                name: Mustangs
+                category: Cars
+                email: abc@email.com
+                ownerid: 3
+              $ref: '#/components/schemas/PostAlbumrequest'
+            example: '{"name":"Mustangs","category":"Cars","email":"abc@email.com","ownerid":"3"}'
+        required: true
+      responses:
+        200:
+          description: ''
+      deprecated: false
+      security: []
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /albums/4:
+    put:
+      tags:
+      - Album Endpoints
+      summary: PUT Album
+      description: PUT endpoint for the business noun.
+      operationId: PutAlbum
+      parameters:
+      - name: Content-Type
+        in: header
+        description: ''
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: application/json
+        example: application/json
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              example:
+                name: Camaros
+                category: Cars
+                email: abc@email.com
+                ownerid: 3
+              $ref: '#/components/schemas/PutAlbumrequest'
+            example: '{"name":"Camaros","category":"Cars","email":"abc@email.com","ownerid":"3"}'
+        required: true
+      responses:
+        200:
+          description: ''
+      deprecated: false
+      security: []
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+    delete:
+      tags:
+      - Album Endpoints
+      summary: DELETE Album
+      description: DELETE endpoint for the business noun.
+      operationId: DeleteAlbum
+      parameters: []
+      responses:
+        200:
+          description: ''
+      deprecated: false
+      security: []
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /users/login:
+    post:
+      tags:
+      - User Endpoints
+      summary: Login
+      description: 'TODO: Add Description'
+      operationId: Login
+      parameters:
+      - name: Content-Type
+        in: header
+        description: ''
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: application/json
+        example: application/json
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              example:
+                userID: 1
+                password: pacman
+              $ref: '#/components/schemas/LoginRequest'
+            example: '{"userID":"1","password":"pacman"}'
+        required: true
+      responses:
+        200:
+          description: ''
+      deprecated: false
+      security: []
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /users:
+    post:
+      tags:
+      - User Endpoints
+      summary: Insert User
+      description: 'TODO: Add Description'
+      operationId: InsertUser
+      parameters:
+      - name: Content-Type
+        in: header
+        description: ''
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: application/json
+        example: application/json
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              example:
+                userID: 1
+                name: mspacman
+                email: mspacman@pac.com
+                password: pacman
+                buildings: []
+              $ref: '#/components/schemas/InsertUserrequest'
+            example: '{"userID":"1","name":"mspacman","email":"mspacman@pac.com","password":"pacman","buildings":[]}'
+        required: true
+      responses:
+        200:
+          description: ''
+      deprecated: false
+      security: []
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /users/1/albums:
+    get:
+      tags:
+      - User Endpoints
+      summary: Get User Albums
+      description: 'TODO: Add Description'
+      operationId: GetUserAlbums
+      parameters: []
+      responses:
+        200:
+          description: ''
+      deprecated: false
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /users/1/photos:
+    get:
+      tags:
+      - User Endpoints
+      summary: Get User Photos
+      description: 'TODO: Add Description'
+      operationId: GetUserPhotos
+      parameters: []
+      responses:
+        200:
+          description: ''
+      deprecated: false
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /users/1:
+    get:
+      tags:
+      - User Endpoints
+      summary: Get User
+      description: 'TODO: Add Description'
+      operationId: GetUser
+      parameters: []
+      responses:
+        200:
+          description: ''
+      deprecated: false
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /photos:
+    post:
+      tags:
+      - Photos Endpoints
+      summary: POST Photos
+      description: POST endpoint for the photos noun.
+      operationId: PostPhotos
+      parameters:
+      - name: Content-Type
+        in: header
+        description: ''
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: application/json
+        example: application/json
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              example:
+                userid: 3
+                title: A photo
+                caption: A photo
+                data: 101010101010101010
+                albumid: 1
+              $ref: '#/components/schemas/PostPhotosrequest'
+            example: '{"userid":3,"title":"A photo","caption":"A photo","data":101010101010101010,"albumid":1}'
+        required: true
+      responses:
+        200:
+          description: ''
+      deprecated: false
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+  /photos/9:
+    put:
+      tags:
+      - Photos Endpoints
+      summary: PUT Photos
+      description: PUT endpoint for the photos noun.
+      operationId: PutPhotos
+      parameters:
+      - name: Content-Type
+        in: header
+        description: ''
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: application/json
+        example: application/json
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              example:
+                userid: 3
+                title: photo
+                caption: A photo
+                data: 101010101010101010
+                albumid: 1
+              $ref: '#/components/schemas/PutPhotosrequest'
+            example: '{"userid":3,"title":"photo","caption":"A photo","data":101010101010101010,"albumid":1}'
+        required: true
+      responses:
+        200:
+          description: ''
+      deprecated: false
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+    delete:
+      tags:
+      - Photos Endpoints
+      summary: DELETE Photos
+      description: DELETE endpoint for the photos noun.
+      operationId: DeletePhotos
+      parameters: []
+      responses:
+        200:
+          description: ''
+      deprecated: false
+      x-operation-settings:
+        CollectParameters: false
+        AllowDynamicQueryParameters: false
+        AllowDynamicFormParameters: false
+        IsMultiContentStreaming: false
+components:
+  schemas:
+    PostAlbumrequest:
+      title: POST AlbumRequest
+      required:
+      - name
+      - category
+      - email
+      - ownerid
+      type: object
+      properties:
+        name:
+          type: string
+          example: Mustangs
+        category:
+          type: string
+          example: Cars
+        email:
+          type: string
+          example: abc@email.com
+        ownerid:
+          type: string
+          example: 3
+      example:
+        name: Mustangs
+        category: Cars
+        email: abc@email.com
+        ownerid: 3
+    PutAlbumrequest:
+      title: PUT AlbumRequest
+      required:
+      - name
+      - category
+      - email
+      - ownerid
+      type: object
+      properties:
+        name:
+          type: string
+          example: Camaros
+        category:
+          type: string
+          example: Cars
+        email:
+          type: string
+          example: abc@email.com
+        ownerid:
+          type: string
+          example: 3
+      example:
+        name: Camaros
+        category: Cars
+        email: abc@email.com
+        ownerid: 3
+    LoginRequest:
+      title: LoginRequest
+      required:
+      - userID
+      - password
+      type: object
+      properties:
+        userID:
+          type: string
+          example: 1
+        password:
+          type: string
+          example: pacman
+      example:
+        userID: 1
+        password: pacman
+    InsertUserrequest:
+      title: Insert UserRequest
+      required:
+      - userID
+      - name
+      - email
+      - password
+      - buildings
+      type: object
+      properties:
+        userID:
+          type: string
+          example: 1
+        name:
+          type: string
+          example: mspacman
+        email:
+          type: string
+          example: mspacman@pac.com
+        password:
+          type: string
+          example: pacman
+        buildings:
+          type: array
+          items:
+            type: string
+            example: []
+          description: ''
+      example:
+        userID: 1
+        name: mspacman
+        email: mspacman@pac.com
+        password: pacman
+        buildings: []
+    PostPhotosrequest:
+      title: POST PhotosRequest
+      required:
+      - userid
+      - title
+      - caption
+      - data
+      - albumid
+      type: object
+      properties:
+        userid:
+          type: integer
+          format: int32
+          example: 3
+        title:
+          type: string
+          example: A photo
+        caption:
+          type: string
+          example: A photo
+        data:
+          type: integer
+          format: int64
+          example: 101010101010101010
+        albumid:
+          type: integer
+          format: int32
+          example: 1
+      example:
+        userid: 3
+        title: A photo
+        caption: A photo
+        data: 101010101010101010
+        albumid: 1
+    PutPhotosrequest:
+      title: PUT PhotosRequest
+      required:
+      - userid
+      - title
+      - caption
+      - data
+      - albumid
+      type: object
+      properties:
+        userid:
+          type: integer
+          format: int32
+          example: 3
+        title:
+          type: string
+          example: photo
+        caption:
+          type: string
+          example: A photo
+        data:
+          type: integer
+          format: int64
+          example: 101010101010101010
+        albumid:
+          type: integer
+          format: int32
+          example: 1
+      example:
+        userid: 3
+        title: photo
+        caption: A photo
+        data: 101010101010101010
+        albumid: 1
+security:
+- {}
